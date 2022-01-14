@@ -1,0 +1,241 @@
+//Ты можешь добавлять свои импорты
+import java.util.*;
+
+//решение должно содержать данный класс
+class Main {
+
+    static int number1, number2;
+    static char operation;
+    static String formatName;
+    static final NavigableMap<Integer, String> units;
+    static final NavigableMap<String, Integer> dictionary;
+
+    static {
+        NavigableMap<Integer, String> initMap = new TreeMap<>();
+        initMap.put(100, "C");
+        initMap.put(90, "XC");
+        initMap.put(50, "L");
+        initMap.put(40, "XL");
+        initMap.put(10, "X");
+        initMap.put(9, "IX");
+        initMap.put(5, "V");
+        initMap.put(4, "IV");
+        initMap.put(1, "I");
+        units = Collections.unmodifiableNavigableMap(initMap);
+    }
+
+    static {
+        NavigableMap<String, Integer> initMap = new TreeMap<>();
+        initMap.put("I", 1);
+        initMap.put("II", 2);
+        initMap.put("III", 3);
+        initMap.put("IV", 4);
+        initMap.put("V", 5);
+        initMap.put("VI", 6);
+        initMap.put("VII", 7);
+        initMap.put("VIII", 8);
+        initMap.put("IX", 9);
+        initMap.put("X", 10);
+        dictionary = Collections.unmodifiableNavigableMap(initMap);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Scanner src = new Scanner(System.in);
+        String inputString = src.nextLine();
+        calc(inputString);
+        String zz = "";
+        String aa = "";
+        String res = "";
+        int count = 0;
+      /* for (int i = 1; i < 11; i++) {
+            for (int j = 1; j < 11; j++) {
+                zz = i+ " + " + j;
+
+                res = " " + calc(zz);
+                aa = zz + " = " +res+" ";
+                System.out.println(aa);
+                count +=1;
+            }
+
+            System.out.println(aa);
+        }*/
+        /*for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+
+                zz = " " +j;
+
+            }
+
+        }*/
+        //System.out.println(count);
+
+    }
+
+    //Решение должно содержать данный метод
+    static String calc(String inputString) throws Exception {
+        //Твой код здесь
+
+        char[] inputChars = new char[10];
+        for (int i = 0; i < inputString.length(); i++) {
+            inputChars[i] = inputString.charAt(i);
+            if (inputChars[i] == '+') {
+                operation = '+';
+            }
+            if (inputChars[i] == '-') {
+                operation = '-';
+            }
+            if (inputChars[i] == '*') {
+                operation = '*';
+            }
+            if (inputChars[i] == '/') {
+                operation = '/';
+            }
+        }
+
+        String[] strings = inputString.replaceAll("\\s", "").split("\\+|\\-|\\/|\\*"); //split("\\+|\\-|\\/|\\*");
+        if (strings[0].length() > 2 || strings[1].length() > 2) {
+                throw new Exception();
+        }
+
+        boolean b = true;
+        try {
+            b = strings.length < 3;
+        }catch (Exception e){
+            throw new Exception();
+        }
+        if(!b){
+            throw new Exception();
+        }
+
+        formatName = numberFormat(strings);
+        boolean inRange = false;
+        try {
+            inRange = checkRange(strings, formatName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (formatName.equals("roman")) {
+            if (inRange) {
+                //calculate Roman
+                System.out.println(calculateRoman(strings));
+                return calculateRoman(strings);
+            } else {
+                throw new Exception();
+                //return null;
+            }
+        }
+
+        else{
+            if (inRange) {
+                //calculate Arabian
+                System.out.println(calculateArabian());
+                return calculateArabian();
+            } else {
+                throw new Exception();
+                //return null;
+            }
+        }
+
+    }
+
+
+
+
+    static String calculateArabian() throws Exception {
+        int result;
+        switch (operation) {
+            case '+':
+                result = number1 + number2;
+                break;
+            case '-':
+                result = number1 - number2;
+                break;
+            case '*':
+                result = number1 * number2;
+                break;
+            case '/':
+                result = number1 / number2;
+                break;
+            default:
+                throw new Exception();
+        }
+
+        return Integer.toString(result);
+    }
+
+    static String calculateRoman(String[] numbers) throws Exception {
+        int result;
+        switch (operation) {
+            case '+':
+                result = dictionary.get(numbers[0]) + dictionary.get(numbers[1]);
+                break;
+            case '-':
+                result = dictionary.get(numbers[0]) - dictionary.get(numbers[1]);
+                if (result < 1) {
+                    throw new Exception();
+                }
+                break;
+            case '*':
+                result = dictionary.get(numbers[0]) * dictionary.get(numbers[1]);
+                break;
+            case '/':
+                result = dictionary.get(numbers[0]) / dictionary.get(numbers[1]);
+                if (result < 1) {
+                    throw new Exception();
+                }
+                break;
+            default:
+                throw new Exception();
+        }
+
+        StringBuilder romanString = new StringBuilder();
+        for (Integer key : units.descendingKeySet()) {
+            while (result >= key) {
+                result -= key;
+                romanString.append(units.get(key));
+            }
+        }
+        return romanString.toString();
+    }
+
+    static boolean checkRange(String[] numbers, String formatName) throws Exception {
+        if (formatName.equals("roman")) {
+            if ((dictionary.get(numbers[0]) < 1 || dictionary.get(numbers[0]) > 10) ||
+                    (dictionary.get(numbers[1]) < 1 && dictionary.get(numbers[1]) > 10)){
+                return false;
+            }
+        } else {
+            try {
+                number1 = Integer.parseInt(numbers[0].trim());
+                number2 = Integer.parseInt(numbers[1].trim());
+                if ((number1 > 10 || number1 < 1) || (number2 > 10 || number2 < 1)) {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                throw new Exception();
+            }
+        }
+        return true;
+    }
+
+    static String numberFormat(String [] number) {
+
+
+        if (dictionary.containsKey(number[0]) && dictionary.containsKey(number[1])) {
+            return "roman";
+        }
+        else {
+            try {
+                Integer.parseInt(number[0]);
+                Integer.parseInt(number[1]);
+
+            }catch (NumberFormatException e){
+                throw new NumberFormatException();
+            }
+
+
+            return "arabian";
+        }
+    }
+}
